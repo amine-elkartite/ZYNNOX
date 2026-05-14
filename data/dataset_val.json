@@ -1,1 +1,1 @@
-[]
+{"prompt": "[Domain: coding] [Topic: authentication] [Type: advantages_limitations] [Level: medium]\nWhat benefits does authentication provide, and what risks should people consider?", "response": "The advantages include: 1) Key benefit 1, 2) Key benefit 2, 3) Key benefit 3. The limitations include: 1) Constraint 1, 2) Constraint 2, 3) Constraint 3.", "metadata": {"id": "Q0002", "domain": "coding", "topic": "authentication", "type": "advantages_limitations", "difficulty": "medium", "languages": "en,fr,ar,de,pt,es"}}

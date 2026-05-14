@@ -18,7 +18,7 @@ from config import (
     AUTO_LEARN_QUALITY_SCORE,
     INFERENCE_STATS_PATH,
     LOCAL_CONFIDENCE_MIN_CHARS,
-    OLLAMA_MODEL,
+    LEGACY_AI_MODEL_NAME,
     RETRAIN_INTERVAL_HOURS,
     RETRAIN_THRESHOLD,
     SCRAPER_TIMEOUT_SECONDS,
@@ -232,7 +232,7 @@ Question: {question}
 
 Answer:
 """
-    generated = query_local_ai(prompt, model=OLLAMA_MODEL).strip()
+    generated = query_local_ai(prompt, model=LEGACY_AI_MODEL_NAME).strip()
     if generated.startswith("ERROR:"):
         logging.warning("Context answer generation failed: %s", generated)
         return {"answer": "Not found", "sources": []}
@@ -251,7 +251,7 @@ def auto_learn(
     return save_to_db(
         question=question,
         answer=answer,
-        model_name=OLLAMA_MODEL,
+        model_name=LEGACY_AI_MODEL_NAME,
         topic="auto_learning",
         source=source,
         needs_training=True,

@@ -14,7 +14,7 @@ ERROR_PATTERNS = [
     "timeout",
     "connection error",
     "connection refused",
-    "ollama returned",
+    "legacy ai returned",
     "request failure",
     "invalid json",
 ]

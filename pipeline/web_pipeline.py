@@ -8,7 +8,7 @@ from typing import Any, Iterable
 
 from config import (
     DEFAULT_REDDIT_SUBREDDITS,
-    OLLAMA_MODEL,
+    LEGACY_AI_MODEL_NAME,
     SCRAPING_LOG_PATH,
     WEB_QA_MODEL_NAME,
     WEB_QA_PROMPT_TEMPLATE,
@@ -81,7 +81,7 @@ def _collect_topic_texts(topic: str, n_per_source: int) -> list[str]:
 def _content_to_qa_pairs(content: str) -> list[dict[str, str]]:
     """Ask local Llama3 to convert source text into five Q&A pairs."""
     prompt = WEB_QA_PROMPT_TEMPLATE.format(content=content[:6000])
-    response = query_local_ai(prompt, model=OLLAMA_MODEL)
+    response = query_local_ai(prompt, model=LEGACY_AI_MODEL_NAME)
     if response.startswith("ERROR:"):
         logging.warning("Q&A generation failed: %s", response)
         return []

@@ -7,7 +7,7 @@ import logging
 from config import (
     DEFAULT_QUESTION_COUNT,
     DEFAULT_TOPICS,
-    OLLAMA_MODEL,
+    LEGACY_AI_MODEL_NAME,
     PIPELINE_LOG_PATH,
     ensure_directories,
 )
@@ -37,7 +37,7 @@ def run_collection_pipeline(
     topics: list[str],
     n_questions: int = 100,
 ) -> dict[str, int]:
-    """Generate questions, query Ollama, skip duplicates, and save answers."""
+    """Generate questions, query the configured external AI path, and save answers."""
     from tqdm import tqdm
 
     setup_logging()
@@ -56,12 +56,12 @@ def run_collection_pipeline(
                 logging.info("Skipping duplicate question: %s", item.question)
                 continue
 
-            answer = query_local_ai(item.question, model=OLLAMA_MODEL)
+            answer = query_local_ai(item.question, model=LEGACY_AI_MODEL_NAME)
             if answer.startswith("ERROR:"):
                 failed += 1
-                logging.warning("Ollama query failed for question: %s | %s", item.question, answer)
+                logging.warning("Legacy AI query failed for question: %s | %s", item.question, answer)
 
-            if save_to_db(item.question, answer, OLLAMA_MODEL, item.topic):
+            if save_to_db(item.question, answer, LEGACY_AI_MODEL_NAME, item.topic):
                 saved += 1
                 logging.info("Saved Q&A pair for topic '%s'.", item.topic)
             else:

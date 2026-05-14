@@ -1,6 +1,9 @@
 .env
 .env.*
 !.env.example
+node_modules/
+client/dist/
+server/data/
 __pycache__/
 *.pyc
 data/*.db

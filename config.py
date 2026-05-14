@@ -17,9 +17,9 @@ SCRAPING_LOG_PATH = DATA_DIR / "scraping.log"
 SMART_INFERENCE_LOG_PATH = DATA_DIR / "smart_inference.log"
 INFERENCE_STATS_PATH = DATA_DIR / "inference_stats.json"
 
-# Ollama settings used by the local AI query client.
-OLLAMA_API_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
+# Legacy Python data utilities no longer connect to a local model runtime.
+# The production AI provider is configured in server/src/config/env.js.
+LEGACY_AI_MODEL_NAME = "zynnox-external-provider"
 REQUEST_TIMEOUT_SECONDS = 60
 REQUEST_RETRIES = 3
 RETRY_BACKOFF_SECONDS = 2
@@ -91,7 +91,7 @@ DEFAULT_NEWS_FEEDS = [
 ]
 COMMON_CRAWL_INDEX_URL = "http://index.commoncrawl.org/"
 COMMON_CRAWL_COLLINFO_URL = "http://index.commoncrawl.org/collinfo.json"
-WEB_QA_MODEL_NAME = f"{OLLAMA_MODEL}-web-qa"
+WEB_QA_MODEL_NAME = f"{LEGACY_AI_MODEL_NAME}-web-qa"
 WEB_QA_PROMPT_TEMPLATE = """Read this text and generate 5 question-answer pairs from it.
 Format each pair exactly as:
 Q: ...
