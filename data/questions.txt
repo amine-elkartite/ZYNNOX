@@ -1,0 +1,200 @@
+What are common misconceptions about recursion?
+How has geography changed over time?
+How has critical thinking changed over time?
+How has fractions changed over time?
+How has probability changed over time?
+Can you compare free will with another idea from philosophy?
+What is the Industrial Revolution, and why is it important in history?
+Can you compare machine learning code with another idea from coding?
+What steps would you follow to analyze the Renaissance?
+How would you explain consciousness to a beginner studying philosophy?
+What steps would you follow to analyze the Industrial Revolution?
+What is a practical example of truth?
+How would you explain the solar system to a beginner studying science?
+What are common misconceptions about data structures?
+Can you compare APIs with another idea from coding?
+How has logic changed over time?
+What is a practical example of the printing press?
+What are the advantages and limitations of personal finance?
+What are the advantages and limitations of the Cold War?
+How would you explain public speaking to a beginner studying general knowledge?
+What are the main causes or principles behind logic?
+Why do experts in mathematics care about optimization?
+How has the Industrial Revolution changed over time?
+What are common misconceptions about databases?
+What steps would you follow to analyze evolution?
+How would you explain the French Revolution to a beginner studying history?
+What steps would you follow to analyze vaccines?
+What are the advantages and limitations of justice?
+What are the main causes or principles behind data structures?
+What is a practical example of logic?
+What steps would you follow to analyze free will?
+What is World War II, and why is it important in history?
+How would you explain the Cold War to a beginner studying history?
+What is version control, and why is it important in coding?
+What are common misconceptions about optimization?
+Why do experts in philosophy care about truth?
+Can you compare linear algebra with another idea from mathematics?
+What is databases, and why is it important in coding?
+What is a practical example of the Renaissance?
+What is technology trends, and why is it important in general knowledge?
+What are the advantages and limitations of evolution?
+What steps would you follow to analyze the solar system?
+How would you explain photosynthesis to a beginner studying science?
+Why do experts in history care about the American Revolution?
+What are the advantages and limitations of fractions?
+Can you compare ancient Egypt with another idea from history?
+What is gravity, and why is it important in science?
+Can you compare the American Revolution with another idea from history?
+What are the main causes or principles behind APIs?
+How has personal finance changed over time?
+What are the main causes or principles behind meaning?
+How has testing changed over time?
+What are the main causes or principles behind truth?
+Can you compare ecosystems with another idea from science?
+How would you explain vaccines to a beginner studying science?
+What is Python functions, and why is it important in coding?
+What are common misconceptions about functions?
+What is a practical example of nutrition?
+What are common misconceptions about the scientific method?
+What are common misconceptions about evolution?
+Why do experts in philosophy care about meaning?
+What steps would you follow to analyze virtue?
+How would you explain logic to a beginner studying mathematics?
+Can you compare probability with another idea from mathematics?
+Why do experts in general knowledge care about geography?
+What is a practical example of languages?
+How has healthy habits changed over time?
+How has knowledge changed over time?
+How would you explain linear algebra to a beginner studying mathematics?
+How has vaccines changed over time?
+What is geometry, and why is it important in mathematics?
+Why do experts in history care about the Cold War?
+What steps would you follow to analyze ethics?
+What is machine learning code, and why is it important in coding?
+What are the advantages and limitations of geography?
+Why do experts in coding care about Python functions?
+What is a practical example of atoms?
+How would you explain critical thinking to a beginner studying general knowledge?
+What are the advantages and limitations of languages?
+What is a practical example of Python functions?
+What are the main causes or principles behind personal finance?
+What are common misconceptions about version control?
+What is truth, and why is it important in philosophy?
+How would you explain ancient Egypt to a beginner studying history?
+Why do experts in mathematics care about prime numbers?
+What is space exploration, and why is it important in general knowledge?
+Why do experts in mathematics care about functions?
+How would you explain databases to a beginner studying coding?
+What is a practical example of gravity?
+Why do experts in general knowledge care about space exploration?
+What are the main causes or principles behind identity?
+What are the main causes or principles behind critical thinking?
+What is evolution, and why is it important in science?
+What is world capitals, and why is it important in general knowledge?
+What steps would you follow to analyze object-oriented programming?
+What are the advantages and limitations of optimization?
+Can you compare atoms with another idea from science?
+What is ecosystems, and why is it important in science?
+What is a practical example of ecosystems?
+What is linear algebra, and why is it important in mathematics?
+How would you explain political philosophy to a beginner studying philosophy?
+What steps would you follow to analyze geography?
+What is a practical example of ethics?
+Can you compare photosynthesis with another idea from science?
+What steps would you follow to analyze Python functions?
+What are common misconceptions about ecosystems?
+Why do experts in history care about the Renaissance?
+What is political philosophy, and why is it important in philosophy?
+Why do experts in philosophy care about free will?
+What are the advantages and limitations of object-oriented programming?
+Can you compare gravity with another idea from science?
+How has technology trends changed over time?
+What steps would you follow to analyze electricity?
+How has functions changed over time?
+What steps would you follow to analyze consciousness?
+What are the advantages and limitations of the French Revolution?
+What are common misconceptions about healthy habits?
+What steps would you follow to analyze data structures?
+What is a practical example of personal finance?
+How would you explain the printing press to a beginner studying history?
+What steps would you follow to analyze space exploration?
+What is functions, and why is it important in mathematics?
+Why do experts in history care about the Silk Road?
+Can you compare statistics with another idea from mathematics?
+What are common misconceptions about the American Revolution?
+What are the advantages and limitations of atoms?
+What is the Silk Road, and why is it important in history?
+What are common misconceptions about critical thinking?
+Why do experts in history care about the Roman Empire?
+What are common misconceptions about the solar system?
+What are the advantages and limitations of the Renaissance?
+How would you explain statistics to a beginner studying mathematics?
+What are the advantages and limitations of World War II?
+What is probability, and why is it important in mathematics?
+What is a practical example of vaccines?
+How has justice changed over time?
+How would you explain version control to a beginner studying coding?
+Why do experts in science care about evolution?
+What is a practical example of identity?
+Can you compare climate change with another idea from science?
+What are the main causes or principles behind technology trends?
+What are the main causes or principles behind the Cold War?
+What are the advantages and limitations of prime numbers?
+Why do experts in coding care about debugging?
+What are common misconceptions about justice?
+What are the advantages and limitations of photosynthesis?
+How has free will changed over time?
+What are common misconceptions about fractions?
+What are the main causes or principles behind space exploration?
+What are common misconceptions about ethics?
+How would you explain technology trends to a beginner studying general knowledge?
+Why do experts in history care about World War II?
+What is a practical example of free will?
+How would you explain truth to a beginner studying philosophy?
+What are the main causes or principles behind knowledge?
+What is knowledge, and why is it important in philosophy?
+What are the main causes or principles behind Python functions?
+What is a practical example of debugging?
+What is a practical example of photosynthesis?
+What steps would you follow to analyze optimization?
+How has recursion changed over time?
+What steps would you follow to analyze political philosophy?
+How would you explain the scientific method to a beginner studying science?
+What are common misconceptions about identity?
+What are common misconceptions about machine learning code?
+What is a practical example of fractions?
+What is a practical example of the Silk Road?
+What are the advantages and limitations of ecosystems?
+What are common misconceptions about languages?
+What are common misconceptions about calculus?
+Why do experts in general knowledge care about public speaking?
+What is debugging, and why is it important in coding?
+How has prime numbers changed over time?
+How would you explain fractions to a beginner studying mathematics?
+Why do experts in science care about vaccines?
+How would you explain the Silk Road to a beginner studying history?
+Can you compare the Cold War with another idea from history?
+What steps would you follow to analyze languages?
+What is data structures, and why is it important in coding?
+Can you compare the French Revolution with another idea from history?
+What steps would you follow to analyze the French Revolution?
+What are the main causes or principles behind the printing press?
+What are the advantages and limitations of the solar system?
+How would you explain ethics to a beginner studying philosophy?
+What is a practical example of machine learning code?
+What are the advantages and limitations of Python functions?
+How has data structures changed over time?
+How would you explain the Renaissance to a beginner studying history?
+Why do experts in coding care about object-oriented programming?
+Can you compare critical thinking with another idea from general knowledge?
+What is a practical example of electricity?
+What is calculus, and why is it important in mathematics?
+What steps would you follow to analyze nutrition?
+How has the Roman Empire changed over time?
+How has political philosophy changed over time?
+What are common misconceptions about prime numbers?
+Can you compare functions with another idea from mathematics?
+What steps would you follow to analyze critical thinking?
+What are the advantages and limitations of testing?
+What is consciousness, and why is it important in philosophy?
