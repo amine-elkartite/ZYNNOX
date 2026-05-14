@@ -43,6 +43,17 @@ export async function addCredits({ userId, amount, reason, referenceType = "syst
   });
 }
 
+export async function removeCredits({ userId, amount, reason, referenceType = "system", referenceId = null }) {
+  return mutateCredits({
+    userId,
+    amount: -Math.abs(Number(amount)),
+    type: "debit",
+    reason,
+    referenceType,
+    referenceId
+  });
+}
+
 export async function deductCredits({ userId, amount, reason, referenceType, referenceId, actionType, metadata = {} }) {
   await assertCredits(userId, amount);
   const result = await mutateCredits({
@@ -91,11 +102,18 @@ export async function creditHistory(userId, limit = 50) {
   return listCreditTransactions(userId, limit);
 }
 
-export async function resetMonthlyCredits({ userId, plan }) {
+export async function grantMonthlyCredits({ userId, plan }) {
+  const monthlyCredits = Number(plan.monthlyCredits || 0);
+  if (!monthlyCredits) return null;
+  const balance = await getBalance(userId);
+  const topUpAmount = Math.max(0, monthlyCredits - balance.balance);
+  if (!topUpAmount) {
+    return { user: { ...balance, id: userId, credits: balance.balance }, transaction: null };
+  }
   return addCredits({
     userId,
-    amount: Number(plan.monthlyCredits || 0),
-    reason: `${plan.name} monthly credit reset`,
+    amount: topUpAmount,
+    reason: `${plan.name} monthly credit grant`,
     referenceType: "subscription",
     referenceId: plan.id
   });

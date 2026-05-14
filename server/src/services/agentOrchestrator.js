@@ -8,6 +8,7 @@ import { uiuxAgent } from "../agents/uiuxAgent.js";
 import { estimateChatCost } from "../config/creditCosts.js";
 import { aiProviderService } from "./aiProviderService.js";
 import { assertCredits, chargeForAction, getBalance } from "./creditService.js";
+import { runIntelligenceQuery } from "./intelligenceService.js";
 import {
   addAgentStep,
   addMessage,
@@ -76,7 +77,7 @@ async function step(runId, agent, input, runner) {
 }
 
 export async function runAgentConversation({ userId, message, conversationId }) {
-  const cleanMessage = cleanText(message, 12000);
+  const cleanMessage = cleanText(message, 80000);
   const estimatedCredits = estimateChatCost(cleanMessage);
   await assertCredits(userId, estimatedCredits);
 
@@ -87,6 +88,52 @@ export async function runAgentConversation({ userId, message, conversationId }) 
 
   const history = await listMessages({ userId, conversationId: conversation.id });
   const run = await createAgentRun({ userId, conversationId: conversation.id, input: cleanMessage });
+
+  if (process.env.INTELLIGENCE_MODE !== "legacy") {
+    const intelligence = await runIntelligenceQuery({ userId, message: cleanMessage });
+    const creditsUsed = intelligence.billable === false ? 0 : estimatedCredits;
+    const charge = creditsUsed
+      ? await chargeForAction({
+          userId,
+          credits: creditsUsed,
+          actionType: "ai_intelligence_answer",
+          referenceType: "agent_run",
+          referenceId: run.id,
+          metadata: {
+            category: intelligence.category,
+            providers: intelligence.providerResponses?.map((item) => item.provider) || [],
+            costUsd: intelligence.costUsd || 0
+          }
+        })
+      : null;
+    const remainingCredits = charge?.user?.credits ?? (await getBalance(userId)).balance;
+    const usedAgents = ["intelligence-router", "web-search", "multi-provider", "cross-validator", "synthesizer", "fact-checker"];
+    await addMessage({
+      conversationId: conversation.id,
+      userId,
+      role: "assistant",
+      content: intelligence.answer,
+      metadata: { runId: run.id, usedAgents, sources: intelligence.sources, creditsUsed, remainingCredits, intelligence }
+    });
+    await finishAgentRun({ runId: run.id, status: "completed", output: intelligence.answer, usedAgents, sources: intelligence.sources, creditsUsed });
+    return {
+      answer: intelligence.answer,
+      actionItems: [],
+      usedAgents,
+      sources: intelligence.sources,
+      conversationId: conversation.id,
+      runId: run.id,
+      intelligence,
+      providerResponses: intelligence.providerResponses,
+      comparison: intelligence.comparison,
+      factChecks: intelligence.factChecks,
+      steps: intelligence.steps,
+      creditsUsed,
+      remainingCredits,
+      balance: await getBalance(userId)
+    };
+  }
+
   const context = { userId, runId: run.id, message: cleanMessage, history, ai: aiProviderService, tools };
 
   const routerResult = await step(run.id, routerAgent, { message: cleanMessage }, () => routerAgent.run(context));

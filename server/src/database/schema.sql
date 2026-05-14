@@ -200,3 +200,92 @@ CREATE TABLE IF NOT EXISTS settings (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(user_id, key)
 );
+
+CREATE TABLE IF NOT EXISTS search_cache (
+  id TEXT PRIMARY KEY,
+  cache_key TEXT UNIQUE NOT NULL,
+  query TEXT NOT NULL,
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS knowledge_base (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+  query TEXT NOT NULL,
+  query_embedding JSONB NOT NULL DEFAULT '[]'::jsonb,
+  answer TEXT NOT NULL,
+  sources JSONB NOT NULL DEFAULT '[]'::jsonb,
+  confidence_scores JSONB NOT NULL DEFAULT '{}'::jsonb,
+  provider_votes JSONB NOT NULL DEFAULT '{}'::jsonb,
+  verified BOOLEAN NOT NULL DEFAULT FALSE,
+  category TEXT NOT NULL DEFAULT 'factual',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  last_accessed TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  access_count INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS training_questions (
+  id TEXT PRIMARY KEY,
+  source TEXT NOT NULL,
+  source_id TEXT NOT NULL,
+  domain TEXT NOT NULL DEFAULT 'general',
+  topic TEXT,
+  question_type TEXT,
+  difficulty TEXT,
+  question TEXT NOT NULL,
+  translations JSONB NOT NULL DEFAULT '{}'::jsonb,
+  languages JSONB NOT NULL DEFAULT '[]'::jsonb,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(source, source_id)
+);
+
+CREATE TABLE IF NOT EXISTS provider_performance (
+  id TEXT PRIMARY KEY,
+  provider TEXT NOT NULL,
+  category TEXT NOT NULL,
+  query_id TEXT,
+  response TEXT,
+  score NUMERIC NOT NULL DEFAULT 0,
+  was_correct BOOLEAN NOT NULL DEFAULT FALSE,
+  response_time_ms INTEGER NOT NULL DEFAULT 0,
+  cost_usd NUMERIC NOT NULL DEFAULT 0,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS learned_facts (
+  id TEXT PRIMARY KEY,
+  fact TEXT NOT NULL,
+  fact_embedding JSONB NOT NULL DEFAULT '[]'::jsonb,
+  source_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
+  confidence TEXT NOT NULL,
+  verified_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS prompt_experiments (
+  id TEXT PRIMARY KEY,
+  prompt_variant TEXT NOT NULL,
+  category TEXT NOT NULL,
+  uses INTEGER NOT NULL DEFAULT 0,
+  avg_user_score NUMERIC NOT NULL DEFAULT 0,
+  wins INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS intelligence_events (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  query TEXT NOT NULL,
+  category TEXT NOT NULL,
+  providers JSONB NOT NULL DEFAULT '[]'::jsonb,
+  search JSONB NOT NULL DEFAULT '{}'::jsonb,
+  confidence JSONB NOT NULL DEFAULT '{}'::jsonb,
+  cost_usd NUMERIC NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

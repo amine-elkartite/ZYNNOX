@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: zynnox
+      POSTGRES_USER: zynnox
+      POSTGRES_PASSWORD: zynnox
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  server:
+    build: .
+    command: npm run dev --workspace server
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      CLIENT_URL: http://localhost:5173
+      DATABASE_URL: postgres://zynnox:zynnox@db:5432/zynnox
+      JWT_SECRET: dev_jwt_secret_change_me
+      AI_MODE: demo
+      SEARCH_MODE: demo
+      BILLING_MODE: demo
+      VITE_API_URL: http://localhost:5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  client:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: sh -lc "npm ci && npm run dev --workspace client"
+    environment:
+      VITE_API_URL: http://localhost:5000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+
+volumes:
+  pgdata:

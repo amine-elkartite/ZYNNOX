@@ -1,142 +1,129 @@
 # ZYNNOX
 
-ZYNNOX is a SaaS AI Agent platform for agent chat, live web search, AI-powered research, website generation, code improvement, security review, user accounts, credits, subscriptions, and admin operations.
+ZYNNOX is a SaaS AI agent platform for authenticated agent chat, AI Search, website generation, web research workflows, credits, subscriptions, and admin oversight.
 
-The production app is split into:
+## Production Architecture
 
-- `server/`: Express API, auth, credits, billing-ready services, multi-agent orchestration, web search, AI Search, website builder, admin APIs.
-- `client/`: React/Vite SaaS dashboard with ZYNNOX branding, auth, chat, AI Search, website builder, credits, billing, history, and admin views.
-- `pipeline/` and `training/`: preserved Python data/search/training utilities from the original prototype.
+The production path is the Node/React app:
 
-## Features
+- `server/`: Express API for auth, credits, billing, agent orchestration, search, website generation, conversation history, and admin endpoints.
+- `client/`: React/Vite dashboard for the public site, auth, agent chat, AI Search, website builder, credits, billing, profile, history, and admin views.
 
-- Multi-agent architecture with Router, Research, AI Search, Website Builder, Coding, Security, UI/UX, Business, and Final Answer agents.
-- Real web search provider abstraction: Serper, Tavily, Brave-compatible paths, plus demo mode.
-- AI provider abstraction for OpenAI-compatible APIs through environment variables.
-- User registration/login with bcrypt password hashing and JWT auth.
-- Credits, usage logs, starter credits, server-side credit checks, refunds-ready structure, and admin adjustments.
-- Plans, subscriptions, invoices, payment events, demo billing, and Stripe-ready checkout/webhook architecture.
-- Website generation endpoint returning project structure, files, instructions, and preview notes.
-- Admin APIs for users, usage, subscriptions, agent runs, generated websites, plans, and invoices.
-- Professional responsive dashboard with dark navy/cyan ZYNNOX design.
+Legacy Python prototype and data utility code is archived in `archive/python-legacy/`. It is preserved for reference only and is not part of the production app path.
 
-## Tech Stack
-
-- Backend: Node.js, Express, Zod, JWT, bcryptjs, Helmet, CORS, rate limiting.
-- Frontend: React, Vite, lucide-react, CSS.
-- Storage: file-backed demo store in `server/data/`; SQL schema provided for production database readiness.
-- Payments: demo mode by default, Stripe-ready production abstraction.
-
-## Environment
-
-Copy `.env.example` to `.env` and configure values:
-
-```bash
-NODE_ENV=development
-PORT=5000
-CLIENT_URL=http://localhost:5173
-
-AI_MODE=demo
-AI_PROVIDER=openai
-AI_API_KEY=your_ai_api_key_here
-AI_BASE_URL=https://api.openai.com/v1
-AI_MODEL=gpt-4o-mini
-
-SEARCH_MODE=demo
-SEARCH_PROVIDER=serper
-SEARCH_API_KEY=your_search_api_key_here
-
-DATABASE_URL=your_database_url
-JWT_SECRET=your_secure_jwt_secret
-FREE_STARTER_CREDITS=25
-
-BILLING_MODE=demo
-PAYMENT_PROVIDER=stripe
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-STRIPE_PRICE_STARTER=
-STRIPE_PRICE_PRO=
-STRIPE_PRICE_BUSINESS=
-
-VITE_API_URL=http://localhost:5000
-```
-
-## Run
+## Local Setup
 
 ```bash
 npm install
 npm run dev
 ```
 
-Backend only:
+Server only:
 
 ```bash
-npm run dev --workspace server
+npm run dev:server
 ```
 
-Frontend only:
+Client only:
 
 ```bash
-npm run dev --workspace client
+npm run dev:client
 ```
 
-Build:
+The client runs on `http://localhost:5173` and the API runs on `http://localhost:5000` by default.
+
+## Docker Setup
 
 ```bash
+docker compose up --build
+```
+
+The compose stack starts Postgres, the Express server, and the Vite client. Demo mode is enabled by default.
+
+## Testing And Quality
+
+```bash
+npm run lint
+npm run test
 npm run build
+npm run check
 ```
 
-## Demo Mode vs Production Mode
+Server tests use Vitest and Supertest. Client tests use Vitest, jsdom, and Testing Library.
 
-Demo mode works without API keys. It simulates AI output, search results, subscriptions, and credit purchases for local development.
+## CI
 
-Production mode requires real keys:
+GitHub Actions runs on push and pull request:
 
-- `AI_MODE=production` with `AI_API_KEY`.
-- `SEARCH_MODE=production` with `SEARCH_API_KEY`.
-- `BILLING_MODE=production` with Stripe keys and webhook secret.
+- `npm ci`
+- `npm run lint`
+- `npm run test`
+- `npm run build`
 
-## Core APIs
+Workflow file: `.github/workflows/ci.yml`.
 
+## Environment Variables
+
+Copy `.env.example` to `.env` for local development.
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `NODE_ENV` | Runtime environment | `development` |
+| `PORT` | API port | `5000` |
+| `CLIENT_URL` | Allowed frontend origin list | `http://localhost:5173` |
+| `DATABASE_URL` | Optional Postgres connection string | file-backed demo store when empty |
+| `MEMORY_FILE` | File store path for demo mode | `server/data/zynnox-store.json` |
+| `JWT_SECRET` | JWT signing secret | generated in non-production |
+| `FREE_STARTER_CREDITS` | Registration starter credits | `25` |
+| `AI_MODE` | `demo` or `production` AI mode | `demo` |
+| `AI_API_KEY` | AI provider key | empty |
+| `AI_BASE_URL` | OpenAI-compatible base URL | `https://api.openai.com/v1` |
+| `AI_MODEL` | AI model name | `gpt-4o-mini` |
+| `SEARCH_MODE` | `demo` or `production` search mode | `demo` |
+| `SEARCH_PROVIDER` | Search provider selector | `serper` |
+| `SEARCH_API_KEY` | Search provider key | empty |
+| `BILLING_MODE` | `demo` or `production` billing mode | `demo` |
+| `STRIPE_SECRET_KEY` | Stripe API key for production billing | empty |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | empty |
+| `STRIPE_PRICE_STARTER` | Stripe price id for Starter | empty |
+| `STRIPE_PRICE_PRO` | Stripe price id for Pro | empty |
+| `STRIPE_PRICE_BUSINESS` | Stripe price id for Business | empty |
+| `VITE_API_URL` | Client API base URL | `http://localhost:5000` |
+
+## Feature Status
+
+| Area | Status | Notes |
+| --- | --- | --- |
+| Auth | Live | Register, login, JWT-protected profile and session endpoints. |
+| Agent chat | Live/demo capable | Demo AI works without keys; production uses configured AI provider. |
+| AI Search | Live/demo capable | Demo search works locally; production requires search provider keys. |
+| Website Builder | Live/demo capable | Generates project structures and files through the server. |
+| Conversation history | Live | Dashboard history reads `/api/conversations` and detail endpoints. |
+| Credits | Live | Server-side balance checks, debit/credit transactions, and admin adjustments. |
+| Billing | Demo live, Stripe-ready | Demo upgrades and credit packs work; Stripe webhook route uses raw-body signature verification. |
+| Admin | Live | Admin users, usage, agent runs, and generated websites are exposed through protected endpoints. |
+| Settings UI | Planned | Environment-driven settings are server-side; dashboard settings are marked Coming soon. |
+| Database persistence | Planned/live-ready | File-backed demo store is active; Postgres schema is present for production hardening. |
+| Legacy Python tools | Archived | Preserved under `archive/python-legacy/` and not wired into production. |
+
+## Useful API Routes
+
+- `GET /api/health`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
-- `PUT /api/auth/profile`
+- `GET /api/agent/dashboard`
+- `POST /api/agent/chat`
+- `GET /api/conversations`
+- `GET /api/conversations/:id`
 - `GET /api/credits/balance`
 - `GET /api/credits/transactions`
 - `GET /api/billing/plans`
+- `GET /api/billing/subscription`
 - `POST /api/billing/demo-upgrade`
-- `POST /api/billing/buy-credits`
-- `POST /api/agent/chat`
-- `POST /api/search`
-- `POST /api/ai-search`
-- `POST /api/website/create`
+- `POST /api/billing/webhook`
 - `GET /api/admin/users`
 
-## Web Search
+## Repository Hygiene
 
-Set `SEARCH_MODE=production`, choose `SEARCH_PROVIDER=serper`, `tavily`, or `brave`, and add `SEARCH_API_KEY`. Search results are normalized to title, URL, snippet, source, published date, and score. Research and AI Search responses include sources.
-
-## Credits
-
-New users receive `FREE_STARTER_CREDITS`. Costs:
-
-- AI chat: 1
-- Web search answer: 2
-- AI Search quick: 3
-- AI Search standard: 5
-- AI Search deep: 8
-- Website landing: 10
-- Website dashboard/admin: 15
-- Website full-stack: 30
-- Code analysis: 2
-- Security scan: 3
-
-If a user lacks credits, the API returns: `Insufficient credits. Please upgrade your plan or buy more credits.`
-
-## Deployment
-
-- Frontend: Vercel, with `VITE_API_URL` pointing to the backend.
-- Backend: Render, Railway, Fly.io, or similar Node host.
-- Database: Supabase or Neon using the schema in `server/src/database/schema.sql`.
-- Configure `CLIENT_URL` to the deployed frontend origin.
+Do not commit `venv/`, `.venv/`, `node_modules/`, build output, coverage, SQLite files, editor settings, local env files, or generated runtime data. The production app should remain centered on `client/` and `server/`.

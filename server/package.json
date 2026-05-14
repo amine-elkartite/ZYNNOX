@@ -6,15 +6,16 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "build": "node --check src/index.js",
+    "build": "find src -type f -name '*.js' -exec node --check {} \\;",
     "start": "node src/index.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "vitest run"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^4.19.2",
+    "express": "^5.2.1",
     "express-rate-limit": "^7.5.0",
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.2",

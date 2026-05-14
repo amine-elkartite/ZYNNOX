@@ -23,12 +23,13 @@ export async function customerPortal(request, response) {
 }
 
 export async function webhook(request, response) {
-  const rawBody = JSON.stringify(request.body || {});
+  const rawBody = Buffer.isBuffer(request.body) ? request.body : Buffer.from(JSON.stringify(request.body || {}));
   verifyStripeSignature(rawBody, request.headers["stripe-signature"]);
+  const payload = JSON.parse(rawBody.toString("utf8") || "{}");
   const result = await handlePaymentWebhook({
     provider: "stripe",
-    eventType: request.body?.type || "demo.event",
-    payload: request.body || {}
+    eventType: payload?.type || "demo.event",
+    payload
   });
   response.json({ ok: true, ...result });
 }

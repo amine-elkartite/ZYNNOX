@@ -10,12 +10,31 @@ export function isBillingDemo() {
 export function verifyStripeSignature(rawBody, signature) {
   if (isBillingDemo()) return true;
   if (!env.stripeWebhookSecret) throw new AppError("Stripe webhook secret is missing.", 500, "WEBHOOK_SECRET_MISSING");
-  const timestamp = signature?.match(/t=([^,]+)/)?.[1];
-  const expected = signature?.match(/v1=([^,]+)/)?.[1];
-  if (!timestamp || !expected) throw new AppError("Invalid Stripe signature header.", 400, "WEBHOOK_SIGNATURE_INVALID");
-  const payload = `${timestamp}.${rawBody}`;
-  const digest = crypto.createHmac("sha256", env.stripeWebhookSecret).update(payload).digest("hex");
-  if (!crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(expected))) {
+  const header = String(signature || "");
+  const entries = header.split(",").reduce((items, part) => {
+    const [key, value] = part.split("=");
+    if (!key || !value) return items;
+    items[key] = [...(items[key] || []), value];
+    return items;
+  }, {});
+  const timestamp = Number(entries.t?.[0]);
+  const expectedSignatures = entries.v1 || [];
+  if (!Number.isFinite(timestamp) || expectedSignatures.length === 0) {
+    throw new AppError("Invalid Stripe signature header.", 400, "WEBHOOK_SIGNATURE_INVALID");
+  }
+  const ageSeconds = Math.abs(Math.floor(Date.now() / 1000) - timestamp);
+  if (ageSeconds > 300) {
+    throw new AppError("Stripe webhook signature timestamp is outside tolerance.", 400, "WEBHOOK_SIGNATURE_EXPIRED");
+  }
+  const bodyBuffer = Buffer.isBuffer(rawBody) ? rawBody : Buffer.from(String(rawBody || ""), "utf8");
+  const signedPayload = Buffer.concat([Buffer.from(`${timestamp}.`, "utf8"), bodyBuffer]);
+  const digest = crypto.createHmac("sha256", env.stripeWebhookSecret).update(signedPayload).digest("hex");
+  const digestBuffer = Buffer.from(digest, "hex");
+  const verified = expectedSignatures.some((expected) => {
+    const expectedBuffer = Buffer.from(expected, "hex");
+    return expectedBuffer.length === digestBuffer.length && crypto.timingSafeEqual(expectedBuffer, digestBuffer);
+  });
+  if (!verified) {
     throw new AppError("Stripe webhook signature verification failed.", 400, "WEBHOOK_SIGNATURE_INVALID");
   }
   return true;
@@ -38,7 +57,11 @@ export async function createStripeCheckoutSession({ plan, user }) {
     customer_email: user.email,
     "line_items[0][price]": priceId,
     "line_items[0][quantity]": "1",
-    client_reference_id: user.id
+    client_reference_id: user.id,
+    "metadata[userId]": user.id,
+    "metadata[planId]": plan.id,
+    "subscription_data[metadata][userId]": user.id,
+    "subscription_data[metadata][planId]": plan.id
   });
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",

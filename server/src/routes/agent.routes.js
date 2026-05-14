@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { chat, chatSchema, dashboard, runs, tools } from "../controllers/agentController.js";
+import { chat, chatSchema, dashboard, intelligenceDashboard, runs, tools } from "../controllers/agentController.js";
 import { estimateChatCost } from "../config/creditCosts.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { requireCredits } from "../middleware/credit.middleware.js";
@@ -13,3 +13,4 @@ agentRouter.post("/chat", validateBody(chatSchema), requireCredits((request) => 
 agentRouter.get("/runs", asyncHandler(runs));
 agentRouter.get("/tools", asyncHandler(tools));
 agentRouter.get("/dashboard", asyncHandler(dashboard));
+agentRouter.get("/intelligence", asyncHandler(intelligenceDashboard));

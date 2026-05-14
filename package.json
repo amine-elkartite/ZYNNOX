@@ -13,12 +13,22 @@
     "dev:client": "npm run dev --workspace client",
     "build": "npm run build --workspace client && npm run build --workspace server",
     "start": "npm run start --workspace server",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "npm run test --workspaces --if-present",
+    "test:server": "npm run test --workspace server",
+    "test:client": "npm run test --workspace client",
+    "check": "npm run lint && npm run test && npm run build",
+    "audit": "npm audit --omit=dev"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
     "concurrently": "^9.1.2",
     "eslint": "^9.27.0",
-    "globals": "^15.15.0"
+    "globals": "^15.15.0",
+    "jsdom": "^26.1.0",
+    "supertest": "^7.0.0",
+    "vitest": "^3.2.4"
   }
 }

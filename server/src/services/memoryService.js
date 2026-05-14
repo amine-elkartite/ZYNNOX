@@ -36,7 +36,14 @@ const initialStore = () => ({
   generated_websites: [],
   website_files: [],
   tools: DEFAULT_TOOLS,
-  settings: []
+  settings: [],
+  search_cache: [],
+  knowledge_base: [],
+  training_questions: [],
+  provider_performance: [],
+  learned_facts: [],
+  prompt_experiments: [],
+  intelligence_events: []
 });
 
 let cache;
@@ -79,6 +86,15 @@ function safeUser(user) {
   delete safe.passwordHash;
   delete safe.password_hash;
   return safe;
+}
+
+function syncUserSubscriptionFields(data, subscription) {
+  const user = data.users.find((item) => item.id === subscription.userId);
+  if (!user) return null;
+  user.planId = subscription.planId || "free";
+  user.subscriptionStatus = subscription.status || "inactive";
+  user.updatedAt = now();
+  return user;
 }
 
 export async function initializeMemoryService() {
@@ -125,7 +141,7 @@ export async function createUser({ name, email, passwordHash, role = "user" }) {
       createdAt: now(),
       updatedAt: now()
     });
-    data.subscriptions.push({
+    const subscription = {
       id: id(),
       userId: user.id,
       planId: "free",
@@ -136,7 +152,9 @@ export async function createUser({ name, email, passwordHash, role = "user" }) {
       cancelAtPeriodEnd: false,
       createdAt: now(),
       updatedAt: now()
-    });
+    };
+    data.subscriptions.push(subscription);
+    syncUserSubscriptionFields(data, subscription);
     return user;
   });
 }
@@ -450,10 +468,12 @@ export async function upsertSubscription(subscription) {
     const existing = data.subscriptions.find((item) => item.userId === subscription.userId);
     if (existing) {
       Object.assign(existing, subscription, { updatedAt: now() });
+      syncUserSubscriptionFields(data, existing);
       return existing;
     }
     const row = { id: id(), createdAt: now(), updatedAt: now(), ...subscription };
     data.subscriptions.unshift(row);
+    syncUserSubscriptionFields(data, row);
     return row;
   });
 }
@@ -472,6 +492,198 @@ export async function savePaymentEvent(event) {
     data.payment_events.unshift(row);
     return row;
   });
+}
+
+export async function getSearchCache(cacheKey) {
+  const data = await store();
+  const row = data.search_cache.find((item) => item.cacheKey === cacheKey);
+  if (!row) return null;
+  return row;
+}
+
+export async function saveSearchCache({ cacheKey, query, payload, expiresAt }) {
+  return update((data) => {
+    const existing = data.search_cache.find((item) => item.cacheKey === cacheKey);
+    if (existing) {
+      Object.assign(existing, { query, payload, expiresAt, updatedAt: now() });
+      return existing;
+    }
+    const row = { id: id(), cacheKey, query, payload, expiresAt, createdAt: now(), updatedAt: now() };
+    data.search_cache.unshift(row);
+    data.search_cache = data.search_cache.filter((item) => new Date(item.expiresAt) > new Date()).slice(0, 500);
+    return row;
+  });
+}
+
+export async function saveKnowledgeEntry(entry) {
+  return update((data) => {
+    const row = {
+      id: id(),
+      query: entry.query,
+      queryEmbedding: entry.queryEmbedding || [],
+      answer: entry.answer,
+      sources: entry.sources || [],
+      confidenceScores: entry.confidenceScores || {},
+      providerVotes: entry.providerVotes || {},
+      verified: Boolean(entry.verified),
+      category: entry.category || "factual",
+      createdAt: now(),
+      lastAccessed: now(),
+      accessCount: 1
+    };
+    data.knowledge_base.unshift(row);
+    data.knowledge_base = data.knowledge_base.slice(0, 1000);
+    return row;
+  });
+}
+
+export async function listKnowledgeEntries(limit = 200) {
+  const data = await store();
+  return data.knowledge_base.slice(0, limit);
+}
+
+export async function upsertTrainingQuestions(entries, { source = "training-csv" } = {}) {
+  return update((data) => {
+    data.training_questions ||= [];
+    const existingByKey = new Map(data.training_questions.map((item) => [`${item.source}:${item.sourceId}`, item]));
+    let inserted = 0;
+    let updated = 0;
+
+    for (const entry of entries) {
+      const sourceId = String(entry.sourceId || entry.id || entry.question || "").trim();
+      if (!sourceId || !entry.question) continue;
+      const resolvedSource = entry.source || source;
+      const key = `${resolvedSource}:${sourceId}`;
+      const existing = existingByKey.get(key);
+      const payload = {
+        source: resolvedSource,
+        sourceId,
+        domain: entry.domain || "general",
+        topic: entry.topic || "",
+        questionType: entry.questionType || "",
+        difficulty: entry.difficulty || "",
+        question: entry.question,
+        translations: entry.translations || {},
+        languages: entry.languages || [],
+        metadata: entry.metadata || {},
+        updatedAt: now()
+      };
+
+      if (existing) {
+        Object.assign(existing, payload);
+        updated += 1;
+      } else {
+        const row = { id: id(), ...payload, createdAt: now() };
+        data.training_questions.push(row);
+        existingByKey.set(key, row);
+        inserted += 1;
+      }
+    }
+
+    data.training_questions = data.training_questions.slice(-20000);
+    return { inserted, updated, total: data.training_questions.length };
+  });
+}
+
+export async function listTrainingQuestions(limit = 10000) {
+  const data = await store();
+  return (data.training_questions || []).slice(0, limit);
+}
+
+export async function touchKnowledgeEntry(entryId) {
+  return update((data) => {
+    const row = data.knowledge_base.find((item) => item.id === entryId);
+    if (!row) return null;
+    row.lastAccessed = now();
+    row.accessCount = Number(row.accessCount || 0) + 1;
+    return row;
+  });
+}
+
+export async function saveProviderPerformance(entry) {
+  return update((data) => {
+    const row = {
+      id: id(),
+      provider: entry.provider,
+      category: entry.category,
+      queryId: entry.queryId || null,
+      response: entry.response || "",
+      score: Number(entry.score || 0),
+      wasCorrect: Boolean(entry.wasCorrect),
+      responseTimeMs: Number(entry.responseTimeMs || 0),
+      costUsd: Number(entry.costUsd || 0),
+      metadata: entry.metadata || {},
+      createdAt: now()
+    };
+    data.provider_performance.unshift(row);
+    data.provider_performance = data.provider_performance.slice(0, 5000);
+    return row;
+  });
+}
+
+export async function saveLearnedFact(fact) {
+  return update((data) => {
+    const row = {
+      id: id(),
+      fact: fact.fact,
+      factEmbedding: fact.factEmbedding || [],
+      sourceUrls: fact.sourceUrls || [],
+      confidence: fact.confidence || "uncertain",
+      verifiedAt: now(),
+      expiresAt: fact.expiresAt || null
+    };
+    data.learned_facts.unshift(row);
+    data.learned_facts = data.learned_facts.slice(0, 5000);
+    return row;
+  });
+}
+
+export async function saveIntelligenceEvent(event) {
+  return update((data) => {
+    const row = { id: id(), ...event, createdAt: now() };
+    data.intelligence_events.unshift(row);
+    data.intelligence_events = data.intelligence_events.slice(0, 1000);
+    return row;
+  });
+}
+
+export async function recordPromptExperiment(event) {
+  return update((data) => {
+    let row = data.prompt_experiments.find((item) => item.promptVariant === event.promptVariant && item.category === event.category);
+    if (!row) {
+      row = { id: id(), promptVariant: event.promptVariant, category: event.category, uses: 0, avgUserScore: 0, wins: 0, createdAt: now() };
+      data.prompt_experiments.unshift(row);
+    }
+    const nextUses = row.uses + 1;
+    row.avgUserScore = ((row.avgUserScore * row.uses) + Number(event.score || 0)) / nextUses;
+    row.uses = nextUses;
+    row.wins += event.won ? 1 : 0;
+    return row;
+  });
+}
+
+export async function intelligenceSnapshot() {
+  const data = await store();
+  const categories = ["factual", "reasoning", "coding", "news", "creative", "math", "opinion"];
+  const providers = [...new Set(data.provider_performance.map((item) => item.provider))].sort();
+  const leaderboard = providers.map((provider) => {
+    const row = { provider };
+    for (const category of categories) {
+      const entries = data.provider_performance.filter((item) => item.provider === provider && item.category === category);
+      const avg = entries.length ? entries.reduce((sum, item) => sum + Number(item.score || 0), 0) / entries.length : 0;
+      row[category] = Math.round(avg * 100);
+    }
+    return row;
+  });
+  return {
+    leaderboard,
+    totalQueries: data.intelligence_events.length,
+    knowledgeFacts: data.learned_facts.length,
+    knowledgeEntries: data.knowledge_base.length,
+    trainingQuestions: (data.training_questions || []).length,
+    recentEvents: data.intelligence_events.slice(0, 20),
+    promptExperiments: data.prompt_experiments.slice(0, 20)
+  };
 }
 
 export async function listTools() {

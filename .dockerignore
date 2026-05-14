@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+client/dist
+coverage
+.git
+.github
+venv
+.venv
+archive/python-legacy/venv
+.env
+.env.*

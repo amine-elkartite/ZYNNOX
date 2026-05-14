@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { getBalance, addCredits, creditHistory } from "../services/creditService.js";
-import { listUsageLogs, updateUserCredits } from "../services/memoryService.js";
+import { getBalance, addCredits, creditHistory, removeCredits } from "../services/creditService.js";
+import { listUsageLogs } from "../services/memoryService.js";
 
 export const adminCreditSchema = z.object({
   userId: z.string().uuid(),
@@ -36,11 +36,10 @@ export async function adminAddCredits(request, response) {
 }
 
 export async function adminRemoveCredits(request, response) {
-  const balanceBefore = await updateUserCredits(request.body.userId, 0);
-  const result = await addCredits({
+  const result = await removeCredits({
     userId: request.body.userId,
-    amount: Math.max(0, Number(balanceBefore?.credits || 0) - request.body.amount),
-    reason: request.body.reason || "Admin credit reset adjustment",
+    amount: request.body.amount,
+    reason: request.body.reason || "Admin credit debit adjustment",
     referenceType: "admin",
     referenceId: request.user.id
   });
